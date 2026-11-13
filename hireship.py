@@ -12,13 +12,20 @@ def select_question():
 
 def conduct_Assessment(questions):
     candidate_answer =[]
-    for question in questions:
-        print(question["question"])
+    for index,question in enumerate(questions, start=1):
+        print(f"Question {index} .{question["question"]}")
         for key,value in question["options"].items():
             print(f"{key}.{value}")
-        answer = input("Input answer: ").strip().upper()
-        candidate_answer.append(answer)
-        print("Your answer has been successfully recorded!\n")
+
+        while True:
+            answer = input("Input answer(A-D): ").strip().upper()
+
+            if answer in ["A","B","C","D"]:
+                candidate_answer.append(answer)
+                break
+            else:
+                print("Invalid answer. Please enter A, B, C, or D.")
+    print("Your answer has been successfully recorded!\n")
     return candidate_answer
 
 def scoring(questions, candidate_answer):
@@ -57,7 +64,19 @@ def check_result(password):
         return False
     return True
 
-    
+def save_result(name,final_results,status):
+    with open("assessment_result.txt","w") as file:
+        file.write(f"Canditate Name:{name}\n")
+        file.write(f"Final score:{final_results}/10\n")
+        file.write(f"Status: {status}\n")
+        file.write("--------------------------\n")
+
+def view_result():
+    with open("assessment_result.txt", "r") as file:
+        content = file.read()
+        print("\n========== ASSESSMENT RESULTS ==========")
+        print(content)
+
 def main():
     print("====================================")
     print("           SKILL-GATE              ")
@@ -65,26 +84,29 @@ def main():
 
     while True:
         print("you have been selected for an assessment\n")
-        print("You will answer 10 questions.\n")
+        print("You will answer 10 questions.\n what will you like to do")
 
-        option = input("Choose an option (1-2): ").strip()
+        print("\n1. Take Assessment")
+        print("2. View Results")
+        print("3. Exit")
+        option = input("Choose an option (1-2): ""\n").strip()
 
         if option == "1":
+            name = input("Enter your full name: ").strip()
             selected = select_question()
             answer =conduct_Assessment(selected)
             result, final_score, status = scoring(selected, answer)
-            
+            save_result(name,final_score,status)
+            print("Thank you,Assessment completed successfully!")
+            break
+        elif option == "2" :
             while True:
                 password = input("Input password to view result: ").strip()
-
                 if check_result(password):
-                    print(f"Final Score: {final_score}/10")
-                    print(f"Status: {status}")
+                    view_result()
                     break
                 else:
                     print("Wrong password. Try again.")
-            break
-        elif option == "2" :
             break
         else:
             print("Try again")
